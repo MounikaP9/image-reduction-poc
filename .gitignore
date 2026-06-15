@@ -1,0 +1,10 @@
+.DS_Store
+*.img
+dist/
+staging/
+deploy_target/
+mnt_prod/
+logs/
+reports/
+__pycache__/
+*.pyc

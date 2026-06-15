@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: OL9 Image Factory
+    orgId: 1
+    folder: Image Factory
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

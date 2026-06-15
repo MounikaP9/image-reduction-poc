@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+API_URL="${OL9_FACTORY_API_URL:-}"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  OL9_FACTORY_API_URL=http://<oci-public-ip>:8000 ./factory <command>
+
+Commands:
+  build          Build the monolithic OL9 image on the OCI instance
+  split          Split the image into base and platform layers on the OCI instance
+  deploy         Compose the layers with OverlayFS on the OCI instance
+  validate       Validate the composed image and generate the integrity report
+  status         Show lifecycle status from the OCI API service
+  metrics        Show Prometheus metrics from the OCI API service
+  logs <command> Show the latest log for build, split, deploy, or validate
+
+You can also save OL9_FACTORY_API_URL in your shell profile.
+EOF
+}
+
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ -z "$API_URL" ]]; then
+    echo "ERROR: Set OL9_FACTORY_API_URL first, for example:"
+    echo "  export OL9_FACTORY_API_URL=http://<oci-public-ip>:8000"
+    exit 1
+fi
+
+API_URL="${API_URL%/}"
+command="$1"
+
+case "$command" in
+    build|split|deploy|validate)
+        echo "Triggering '${command}' on ${API_URL}..."
+        curl -fsS -X POST "${API_URL}/api/action/${command}"
+        echo
+        ;;
+    status)
+        curl -fsS "${API_URL}/api/status"
+        echo
+        ;;
+    metrics)
+        curl -fsS "${API_URL}/metrics"
+        ;;
+    logs)
+        if [[ $# -ne 2 ]]; then
+            echo "ERROR: logs needs one command: build, split, deploy, or validate"
+            exit 1
+        fi
+        curl -fsS "${API_URL}/api/logs/$2"
+        ;;
+    -h|--help|help)
+        usage
+        ;;
+    *)
+        echo "ERROR: Unknown command: $command"
+        usage
+        exit 1
+        ;;
+esac
