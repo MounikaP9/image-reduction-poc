@@ -1,6 +1,6 @@
 # Oracle Linux 9 Layered Image Factory & Monitoring Control Plane
 
-This blueprint package contains the complete decoupled image infrastructure, deployment scripts, and automation control plane API designed to eliminate 10GB monolithic deployment overhead.
+This repo simulates how to split a big image into multiple layers and use OverlayFS to mount them on the host. It contains the decoupled image infrastructure, deployment scripts, monitoring configuration, and FastAPI control plane used to demonstrate reduced monolithic deployment overhead.
 
 ## Directory Manifest
 * `prod-config.sh`: Global configurations, shared paths, and primitives.
