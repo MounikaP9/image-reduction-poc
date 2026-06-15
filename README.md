@@ -61,3 +61,9 @@ Command mapping:
 * `factory status` reads `/api/status` from the OCI API service.
 * `factory metrics` reads `/metrics` for Prometheus metrics.
 * `factory logs <command>` reads the latest API-captured log for a lifecycle command.
+
+## Documentation
+
+- [Design Document](docs/design.md)
+- [Non-Technical Overview](docs/non-technical-overview.md)
+- [Demo Notes](demo/README.md)
