@@ -9,6 +9,33 @@ DIST_DIR="${BASE_DIR}/dist"
 REPORT_DIR="${BASE_DIR}/reports"
 MANIFEST_FILE="image-manifest.txt"
 
+# Packages that should belong to the reusable base image layer when they are
+# available in the configured OL9 repositories.
+BASE_IMAGE_PACKAGE_CANDIDATES=(
+  kernel
+  kernel-core
+  kernel-modules
+  kernel-modules-core
+  kernel-uek
+  kernel-uek-core
+  kernel-uek-modules
+  dracut
+)
+
+# Demo platform/tooling payload. Packages installed after the base package
+# snapshot are treated as platform-layer content.
+PLATFORM_PACKAGES=(
+  python3
+  podman
+  git
+)
+
+# Packages added during the Day-2 platform update simulation. These are applied
+# to the composed root and then captured back into the platform staging tree.
+PLATFORM_DAY2_PACKAGES=(
+  jq
+)
+
 # Ensure directories exist
 mkdir -p "$MOUNT_DIR" "$STAGING_DIR" "$DIST_DIR" "$REPORT_DIR"
 

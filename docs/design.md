@@ -8,9 +8,10 @@ This project demonstrates a remote Oracle Linux 9 image factory that is controll
 
 - Trigger OCI image lifecycle operations from simple local commands: `build`, `split`, `deploy`, and `validate`.
 - Keep compute-heavy image processing on the OCI instance.
-- Split a monolithic image into base and platform layers.
+- Split a monolithic image into a frozen base layer and a platform delta layer.
 - Recompose the layers into a mounted output root using OverlayFS.
-- Validate that the recomposed output matches the original image, excluding intentional Day-2 update files.
+- Apply Day-2 platform package/config changes without modifying the base layer.
+- Validate that the recomposed output matches the original image, excluding only recorded Day-2 platform delta files.
 - Provide a Grafana dashboard that clearly shows demo progress and artifact sizes.
 
 ## 3. High-Level Architecture
@@ -60,10 +61,21 @@ The API launches lifecycle scripts as background tasks and updates Prometheus me
 
 ### Lifecycle Scripts
 
-- `01-build-prod-image.sh`: creates the monolithic OL9 image and installs packages.
-- `02-split-prod-image.sh`: separates the image into base and platform SquashFS layers.
-- `03-deploy-and-update.sh`: mounts layers, composes them with OverlayFS, and simulates a Day-2 platform update.
-- `04-validate-integrity.sh`: compares the original image with the recomposed output and writes a report.
+- `01-build-prod-image.sh`: creates the monolithic OL9 image, installs the Core/base package set, snapshots the base RPM list, then installs platform packages.
+- `02-split-prod-image.sh`: separates base-owned RPM files from platform files, emits `dist/base-owned-files.txt`, and creates base/platform SquashFS layers.
+- `03-deploy-and-update.sh`: mounts layers, composes them with OverlayFS, applies Day-2 platform changes to the composed root, copies only upperdir changes back into the platform layer, and verifies the base SquashFS digest is unchanged.
+- `04-validate-integrity.sh`: compares the original image with the recomposed output outside recorded Day-2 delta paths and writes a report.
+
+## 4.1 Base Freeze And Platform Delta
+
+The split is driven by RPM ownership, not hardcoded file paths:
+
+- The build step captures every RPM installed after Core/kernel/base setup as the frozen base baseline.
+- The platform package list is computed as the RPM delta introduced after platform tools are installed.
+- The split step starts with a full copy in the platform staging tree, then moves files owned by base RPMs into the base staging tree.
+- The generated `dist/base-owned-files.txt` inventory is used during Day-2 updates to reject platform changes that would override base-owned files.
+
+This models a production rollout rule: platform-only updates can add or change platform-owned content, but any change to base-owned paths requires a new base layer version.
 
 ### Monitoring
 
@@ -90,6 +102,8 @@ Key metrics:
   - `-1`: Not Run
   - `0`: Failed
   - `1`: Passed
+
+Validation also writes an integrity report that includes the mounted output ID and verifies the frozen base layer digest recorded during deployment.
 
 ## 6. Dashboard Panels
 

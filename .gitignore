@@ -8,3 +8,5 @@ logs/
 reports/
 __pycache__/
 *.pyc
+
+.idea/

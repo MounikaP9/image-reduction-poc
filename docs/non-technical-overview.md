@@ -2,11 +2,11 @@
 
 ## Executive Summary
 
-This project shows how a large Oracle Linux 9 system image can be built, split into smaller reusable pieces, reassembled, and validated automatically on an OCI cloud instance. A presenter can run simple commands from a local Mac, while the actual image processing happens remotely in the cloud. A Grafana dashboard shows the progress live so the audience can see what is happening at each stage.
+This project shows how a large Oracle Linux 9 system image can be built, split into smaller reusable pieces, reassembled, updated, and validated automatically on an OCI cloud instance. A presenter can run simple commands from a local Mac, while the actual image processing happens remotely in the cloud. A Grafana dashboard shows the progress live so the audience can see what is happening at each stage.
 
 ## Value Statement
 
-Traditional system images can be large, slow to move, and hard to inspect during updates. This project demonstrates a more modular approach. Instead of treating the image as one large block, it separates the operating system base from the platform/application layer. That makes updates easier to understand and helps show how only part of an image can change while the base remains stable.
+Traditional system images can be large, slow to move, and hard to inspect during updates. This project demonstrates a more modular approach. Instead of treating the image as one large block, it separates the frozen operating system base from the platform/application layer. That makes updates easier to understand and helps show how only the platform layer can change while the base remains stable.
 
 The dashboard makes the process demo-friendly. It shows when each step is running or completed, how large each artifact is, and whether final validation passed.
 
@@ -15,9 +15,10 @@ The dashboard makes the process demo-friendly. It shows when each step is runnin
 - A local user runs `build`, `split`, `deploy`, and `validate` from a Mac terminal.
 - The commands call an API running on an OCI instance.
 - OCI builds the original Oracle Linux image.
-- OCI splits the image into base and platform layers.
+- OCI splits the image into a frozen base layer and a platform package layer.
 - OCI combines the layers using OverlayFS.
-- OCI validates that the final mounted result matches the original image.
+- OCI applies a Day-2 platform package/config change without changing the base layer.
+- OCI validates that the final mounted result matches the original image outside the recorded platform delta.
 - Grafana displays live status and sizes during the process.
 
 ## Technologies Used
@@ -68,4 +69,4 @@ Used to securely access the OCI API and dashboard from the Mac without exposing 
 
 ## Demo Outcome
 
-A successful run proves that the project can remotely build an Oracle Linux image, split it into layers, reassemble it, validate data integrity, and visualize the full process in a dashboard.
+A successful run proves that the project can remotely build an Oracle Linux image, split it into a reusable base and platform delta, update only the platform layer, validate base immutability and data integrity, and visualize the full process in a dashboard.

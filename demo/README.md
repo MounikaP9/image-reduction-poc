@@ -2,6 +2,8 @@
 
 This folder contains notes and links for the OL9 Image Factory demo.
 
+- [Plain-English Demo Script](demo-script.md)
+
 ## Demo Flow
 
 1. Start SSH tunnel to OCI.
@@ -18,6 +20,6 @@ This folder contains notes and links for the OL9 Image Factory demo.
 
 The final validation should show:
 
-- Checksums match
-- Zero data loss
-- Zero corruption
+- Base layer digest remained unchanged
+- Checksums match outside recorded Day-2 platform delta paths
+- No unexpected data loss or corruption
